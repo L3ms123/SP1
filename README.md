@@ -1,2 +1,1 @@
-# SP1
-Synthesis Project 1
+# Synthesis Project 1
