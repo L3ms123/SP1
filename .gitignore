@@ -1,0 +1,40 @@
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment
+.env
+.venv/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Distribution
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Miscellaneous
+.DS_Store
+.idea/
+.vscode/
+.obsidian
+
+# Specific FIles
+Commit*
+Solution*
+Ignore*
+*.raw.ipynb
+*.ignore.ipynb
+*.ignore.pdf
+*.notes.ipynb
+*.bk.ipynb
+*.data
+*.zip
