@@ -35,7 +35,7 @@ def drop_invalid_dates(df, col):
 def drop_invalid_rows(df):
     """
     Drops rows with missing values (containing NaN values) 
-    Drop rows with invalid time; START == END.
+    Drop rows with invalid time; START >= END.
 
     :param df: DataFrame to clean
     :return: Cleaned DataFrame
@@ -44,10 +44,10 @@ def drop_invalid_rows(df):
 
     # Drop rows where START == END
     if 'START' in df.columns and 'END' in df.columns:
-        df = df[df['START'] != df['END']]
+        df = df[df['START'] < df['END']]
 
     # Drop rows with any NaN values
     df = df.dropna()
 
-    print(f"Dropped {initial_len - len(df)} rows with missing values or START == END.")
+    print(f"Dropped {initial_len - len(df)} rows with missing values or START >= END.")
     return df
