@@ -1,13 +1,18 @@
 import pandas as pd
 import numpy as np
 from datetime import timedelta
-from . import data
+import data
 import logging
+import os 
+import redis 
+from dotenv import load_dotenv
 
+
+load_dotenv()
 logger = logging.getLogger(__name__)
 
-# redis_client = redis.StrictRedis(host='172.18.203.199', port=6379, db=0, decode_responses=True)
-# UNAVAILABLE_KEY = "translators_unavailable"
+redis_client = redis.StrictRedis(host='172.18.203.199', port=6379, db=0, decode_responses=True)
+UNAVAILABLE_KEY = dotenv("REDIS_APIKEY")
 
 # def mark_translator_unavailable(translator):
 #     redis_client.sadd(UNAVAILABLE_KEY, translator)
