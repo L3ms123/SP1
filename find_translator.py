@@ -9,12 +9,13 @@ def get_top_translators_for_task(task_input_dict,
                                   clients_df, 
                                   schedules_df,
                                   top_k=4):
-    ## It is important that the task_input_dict has ASSIGNED = timedelta(now)
+    ## It is important that the task_input_dict has ASSIGNED = timedelta(now) TODO
+    #TODO: manage errors, check if the task_input_dict has the required keys
     """
     Given task attributes from the front-end, returns top-k recommended translators.
 
     Parameters:
-        task_input_dict (dict): Dictionary containing task attributes ('TASK_ID', 'TASK_TYPE', 'SOURCE_LANG', 'TARGET_LANG', 
+        task_input_dict (dict): Dictionary containing task attributes ( 'TASK_TYPE', 'SOURCE_LANG', 'TARGET_LANG', 
         'MANUFACTURER', 'MANUFACTURER_INDUSTRY', 'MANUFACTURER_SUBINDUSTRY', 'SELLING_HOURLY_PRICE','MIN_QUALITY', 'WILDCARD', 'ASSIGNED').
         data_df (pd.DataFrame): Full historical dataset.
         train_df (pd.DataFrame): Training dataset of past tasks.
@@ -26,6 +27,21 @@ def get_top_translators_for_task(task_input_dict,
     Returns:
         list[dict]: A list of dictionaries, each containing features of a top recommended translator.
     """
+    # check if task_input_dict is empty
+    if not task_input_dict:
+        return []
+    # check if task_input_dict has the required keys
+    required_keys = ['TASK_TYPE', 'SOURCE_LANG', 'TARGET_LANG', 'TASK_ID', 'TASK_TYPE', 'SOURCE_LANG', 'TARGET_LANG', 
+        'MANUFACTURER', 'MANUFACTURER_INDUSTRY', 'MANUFACTURER_SUBINDUSTRY', 'SELLING_HOURLY_PRICE','MIN_QUALITY', 'ASSIGNED']
+    
+    for key in required_keys:
+        if key not in task_input_dict:
+            return []
+        
+    #check that the target language is not the same as the source language
+    if task_input_dict['SOURCE_LANG'] == task_input_dict['TARGET_LANG']:
+        return []
+
     # Compute translator metrics
     translators_df = metrics.compute_delay_percentage(data_df, transl_cost_pairs_df)
     translators_df = metrics.compute_number_tasks(data_df, translators_df)

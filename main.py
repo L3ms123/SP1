@@ -2,6 +2,7 @@ from utils import metrics
 from utils.data import Task, data_df, schedules_df, clients_df, transl_cost_pairs_df
 from utils import knn
 import logging
+import matplotlib.pyplot as plt
 
 logging.basicConfig(level=logging.CRITICAL)
 
@@ -43,11 +44,14 @@ def main():
     translators_attributes_df = metrics.compute_delay_percentage(data_df_train, transl_cost_pairs_df)
     translators_attributes_df = metrics.compute_number_tasks(data_df_train, translators_attributes_df) 
 
-    validation_df_clean = validation_df_clean[0:100]  # For testing purposes, limit to 100 rows
+    validation_df_clean = validation_df_clean[0:1000]  # For testing purposes, limit to 100 rows
     # Define the top-k value for evaluation
-    k = 5
+    k = 1
     correct_predictions = 0
-    total_predictions = 0
+
+    # ks = [1, 3, 5, 10, 15, 20]
+    # correct_counts = {k: 0 for k in ks}
+    # total_predictions = 0
 
     # Iterate over each row in the validation set
     for idx, task_row in validation_df_clean.iterrows():
@@ -96,11 +100,27 @@ def main():
         if true_translator in top_k_translators['TRANSLATOR'].values:
             correct_predictions += 1
         
-        total_predictions += 1
+    #     total_predictions += 1
+    #     for k in ks:
+    #         top_k_translators = selected_translators.iloc[:k]
+    #         if true_translator in top_k_translators['TRANSLATOR'].values:
+    #             correct_counts[k] += 1
 
-    # Calculate the top-k accuracy
-    top_k_accuracy = correct_predictions / total_predictions
-    print(f"Top-{k} Accuracy: {top_k_accuracy * 100:.2f}%")
+    # accuracies = [correct_counts[k] / total_predictions for k in ks]
+
+    # # Calculate the top-k accuracy
+    # top_k_accuracy = correct_predictions / total_predictions
+    # print(f"Top-{k} Accuracy: {top_k_accuracy * 100:.2f}%")
+    # plt.figure(figsize=(8,5))
+    # plt.plot(ks, accuracies, marker='o')
+    # plt.title("Top-k Accuracy for Different k Values")
+    # plt.xlabel("k")
+    # plt.ylabel("Accuracy")
+    # plt.xticks(ks)
+    # plt.grid(True)
+    # plt.show()
+    
+
 
 if __name__ == "__main__":
     main()
