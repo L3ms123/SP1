@@ -3,7 +3,6 @@ import numpy as np
 from datetime import timedelta
 from . import data
 import logging
-import redis
 
 logger = logging.getLogger(__name__)
 
@@ -428,7 +427,9 @@ def filter_language_price_quality_availability(data_df, schedules_df, translator
         df_filtered = compute_quality_by_task_type(data_df, df_filtered, task_type=task.TASK_TYPE)
         df_filtered = compute_quality_by_languages(data_df, df_filtered, source_lang=task.SOURCE_LANG, target_lang=task.TARGET_LANG)
 
-        df_filtered_quality = df_filtered[df_filtered['AVG_QUALITY_BY_LG'] >= task.MIN_QUALITY]
+        df_filtered_quality = df_filtered[
+            (df_filtered['AVG_QUALITY_BY_LG'] >= task.MIN_QUALITY) | 
+            (df_filtered['AVG_QUALITY_BY_TASK'] >= task.MIN_QUALITY)]
 
         # If the filtered dataframe is empty, it's because the quality is too high.
         if df_filtered_quality.empty:
@@ -439,8 +440,9 @@ def filter_language_price_quality_availability(data_df, schedules_df, translator
                 logger.warning(f" No translators found for task {task.TASK_ID}, wildcard= {task.WILDCARD} because the QUALITY is too high. Relaxing quality filter...")
                 # Skip the quality filter and try again
                 penalization = df_filtered['AVG_QUALITY_BY_LG'].std() * 2
-                df_filtered_quality = df_filtered[df_filtered['AVG_QUALITY_BY_LG'] >= task.MIN_QUALITY-penalization] # Relaxing the quality filter TODO
-            
+                df_filtered_quality = df_filtered[
+                    (df_filtered['AVG_QUALITY_BY_LG'] >= task.MIN_QUALITY-penalization) | 
+                    (df_filtered['AVG_QUALITY_BY_TASK'] >= task.MIN_QUALITY-penalization)]
         # Filter by availability
         df_filtered_availability = available_translators(task, df_filtered_quality, schedules_df)
 
@@ -486,13 +488,17 @@ def filter_language_price_quality_availability(data_df, schedules_df, translator
         df_filtered = compute_quality_by_task_type(data_df, df_filtered, task_type=task.TASK_TYPE)
 
         if task.WILDCARD != "Quality":
-            df_filtered_quality = df_filtered[df_filtered['AVG_QUALITY_BY_LG'] >= task.MIN_QUALITY]
+            df_filtered_quality = df_filtered[
+                (df_filtered['AVG_QUALITY_BY_LG'] >= task.MIN_QUALITY) | 
+                (df_filtered['AVG_QUALITY_BY_TASK'] >= task.MIN_QUALITY)]
 
             if df_filtered_quality.empty:
                 logger.warning(f" No translators found for task {task.TASK_ID}, wildcard= {task.WILDCARD} because the QUALITY is too high. Relaxing quality filter...")
                 # Skip the quality filter and try again
                 penalization = df_filtered['AVG_QUALITY_BY_LG'].std() 
-                df_filtered_quality = df_filtered[df_filtered['AVG_QUALITY_BY_LG'] >= task.MIN_QUALITY-penalization] # Relaxing the quality filter TODO
+                df_filtered_quality = df_filtered[
+                    (df_filtered['AVG_QUALITY_BY_LG'] >= task.MIN_QUALITY-penalization) | 
+                    (df_filtered['AVG_QUALITY_BY_TASK'] >= task.MIN_QUALITY-penalization)]
         else:
             df_filtered_quality = df_filtered.copy()
 
