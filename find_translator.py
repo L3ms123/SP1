@@ -27,6 +27,7 @@ def get_top_translators_for_task(task_input_dict,
     Returns:
         list[dict]: A list of dictionaries, each containing features of a top recommended translator.
     """
+    print("dentro:")
     # check if task_input_dict is empty
     if not task_input_dict:
         return []
