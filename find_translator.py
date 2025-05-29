@@ -10,7 +10,7 @@ def get_top_translators_for_task(task_input_dict,
                                   schedules_df,
                                   top_k=4):
     ## It is important that the task_input_dict has ASSIGNED = timedelta(now) TODO
-    #TODO: manage errors, check if the task_input_dict has the required keys
+    ## TODO: manage errors, check if the task_input_dict has the required keys
     """
     Given task attributes from the front-end, returns top-k recommended translators.
 
