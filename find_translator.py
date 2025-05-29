@@ -27,9 +27,10 @@ def get_top_translators_for_task(task_input_dict,
     Returns:
         list[dict]: A list of dictionaries, each containing features of a top recommended translator.
     """
-    print("dentro:")
+
     # check if task_input_dict is empty
     if not task_input_dict:
+        print("not task input dict")
         return []
     # check if task_input_dict has the required keys
     required_keys = ['TASK_TYPE', 'SOURCE_LANG', 'TARGET_LANG', 'TASK_ID', 'TASK_TYPE', 'SOURCE_LANG', 'TARGET_LANG', 
@@ -37,10 +38,12 @@ def get_top_translators_for_task(task_input_dict,
     
     for key in required_keys:
         if key not in task_input_dict:
+            print("key not in task input dict")
             return []
         
     #check that the target language is not the same as the source language
     if task_input_dict['SOURCE_LANG'] == task_input_dict['TARGET_LANG']:
+        print("same source and target")
         return []
 
     # Compute translator metrics
