@@ -415,6 +415,7 @@ def filter_language_price_quality_availability(data_df, schedules_df, translator
             (translators_attributes_df['HOURLY_RATE'] <= task.SELLING_HOURLY_PRICE) 
         ].copy()
 
+        print("1",df_filtered)
         # If the filtered dataframe is empty, it's because the budget is too low, therefore we have to relax the filter
         if df_filtered.empty:
             if task.WILDCARD == "Price":
@@ -432,7 +433,9 @@ def filter_language_price_quality_availability(data_df, schedules_df, translator
         df_filtered = compute_quality_by_task_type(data_df, df_filtered, task_type=task.TASK_TYPE)
         df_filtered = compute_quality_by_languages(data_df, df_filtered, source_lang=task.SOURCE_LANG, target_lang=task.TARGET_LANG)
 
+        print("fsfsfsadfsad", df_filtered)
         df_filtered_quality = df_filtered[
+
             (df_filtered['AVG_QUALITY_BY_LG'] >= task.MIN_QUALITY) | 
             (df_filtered['AVG_QUALITY_BY_TASK'] >= task.MIN_QUALITY)]
 
@@ -445,6 +448,7 @@ def filter_language_price_quality_availability(data_df, schedules_df, translator
                 logger.warning(f" No translators found for task {task.TASK_ID}, wildcard= {task.WILDCARD} because the QUALITY is too high. Relaxing quality filter...")
                 # Skip the quality filter and try again
                 penalization = df_filtered['AVG_QUALITY_BY_LG'].std() * 2
+                print()
                 df_filtered_quality = df_filtered[
                     (df_filtered['AVG_QUALITY_BY_LG'] >= task.MIN_QUALITY-penalization) | 
                     (df_filtered['AVG_QUALITY_BY_TASK'] >= task.MIN_QUALITY-penalization)]
@@ -493,6 +497,8 @@ def filter_language_price_quality_availability(data_df, schedules_df, translator
         df_filtered = compute_quality_by_task_type(data_df, df_filtered, task_type=task.TASK_TYPE)
 
         if task.WILDCARD != "Quality":
+
+            print(df_filtered)
             df_filtered_quality = df_filtered[
                 (df_filtered['AVG_QUALITY_BY_LG'] >= task.MIN_QUALITY) | 
                 (df_filtered['AVG_QUALITY_BY_TASK'] >= task.MIN_QUALITY)]
@@ -501,6 +507,7 @@ def filter_language_price_quality_availability(data_df, schedules_df, translator
                 logger.warning(f" No translators found for task {task.TASK_ID}, wildcard= {task.WILDCARD} because the QUALITY is too high. Relaxing quality filter...")
                 # Skip the quality filter and try again
                 penalization = df_filtered['AVG_QUALITY_BY_LG'].std() 
+                print(df_filtered)
                 df_filtered_quality = df_filtered[
                     (df_filtered['AVG_QUALITY_BY_LG'] >= task.MIN_QUALITY-penalization) | 
                     (df_filtered['AVG_QUALITY_BY_TASK'] >= task.MIN_QUALITY-penalization)]
