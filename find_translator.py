@@ -1,6 +1,6 @@
 import pandas as pd
 from utils import metrics
-from utils.data import Task, data_df, schedules_df, clients_df, transl_cost_pairs_df
+from utils.data import Task #, data_df, schedules_df, clients_df, transl_cost_pairs_df
 from utils import knn
 
 def get_top_translators_for_task(task_input_dict, 
@@ -56,6 +56,7 @@ def get_top_translators_for_task(task_input_dict,
     # Get client preferences
     client_match = clients_df[clients_df['CLIENT_NAME'].str.strip() == task_row['MANUFACTURER'].strip()]
     if not client_match.empty:
+        print(client_match)
         task_row['WILDCARD'] = client_match.iloc[0]['WILDCARD']
         task_row['HOURLY_RATE'] = client_match.iloc[0]['SELLING_HOURLY_PRICE']
         task_row['QUALITY_EVALUATION'] = client_match.iloc[0]['MIN_QUALITY']
@@ -68,23 +69,25 @@ def get_top_translators_for_task(task_input_dict,
     task = Task(**task_row.to_dict())
 
     # Filter candidate translators
+    print(data_df)
     df_filtered = metrics.filter_language_price_quality_availability(data_df, schedules_df, translators_df, task)
     if df_filtered.empty:
+        print("empty unu")
         return []
 
     # Compute experience features
-    df_filtered = metrics.compute_experience(df_filtered, task.TASK_TYPE, task.SOURCE_LANG, task.TARGET_LANG, task.MANUFACTURER_INDUSTRY, task.MANUFACTURER_SUBINDUSTRY)
-    df_filtered= metrics.compute_experience_for_client(df_filtered, task.MANUFACTURER)
+    df_filtered = metrics.compute_experience(df_filtered, data_df, task.TASK_TYPE, task.SOURCE_LANG, task.TARGET_LANG, task.MANUFACTURER_INDUSTRY, task.MANUFACTURER_SUBINDUSTRY)
+    df_filtered= metrics.compute_experience_for_client(df_filtered, data_df, task.MANUFACTURER)
 
     # Prepare past task features and learn weights
-    past_data = metrics.prepare_past_tasks_features(data_df, task)
-    weights = metrics.train_feature_weight_model(past_data)
+    past_data = knn.prepare_past_tasks_features(data_df, task)
+    weights = knn.train_feature_weight_model(past_data)
 
     # Run KNN to get similar translators
-    distances, indexes = knn(df_filtered, task, data_df, weights, metric='euclidean', need_wildcard=False)
+    distances, indexes = knn.knn(df_filtered, data_df, task, metric='euclidean', need_wildcard=False)
 
     # Select top-k best translators
-    top_translators_df = metrics.get_best_translators(df_filtered, indexes, distances).head(top_k)
+    top_translators_df = knn.get_best_translators(df_filtered, indexes, distances).head(top_k)
 
     return top_translators_df.to_dict(orient='records')
 
