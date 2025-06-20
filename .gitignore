@@ -38,3 +38,5 @@ Ignore*
 *.bk.ipynb
 *.data
 *.zip
+node_modules/
+frontend/node_modules/
